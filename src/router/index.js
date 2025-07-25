@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import LoginForm from '../components/Login.vue'; // Your login form
+import LoginForm from '../components/Login.vue';
 import Home from '../components/Home.vue';
 
 const routes = [
@@ -9,10 +9,14 @@ const routes = [
     component: LoginForm
   },
   {
-    path: '/home', // This is the route for your home form
+    path: '/',
     name: 'Home',
     component: Home,
-    meta: { requiresAuth: true } // This meta field indicates that this route requires authentication
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
   }
 ];
 
@@ -21,19 +25,18 @@ const router = createRouter({
   routes
 });
 
-// Navigation Guard: This prevents unauthorized access to the /home route
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('isAuthenticated'); // Check our simple auth flag
+  const isAuthenticated = localStorage.getItem('isAuthenticated');
 
   if (to.meta.requiresAuth && !isAuthenticated) {
-    // If the route requires auth and user is not authenticated, redirect to login
-    next('/login');
-  } else if (to.path === '/' && isAuthenticated) {
-    // If user is authenticated and tries to go to '/', redirect to home
-    next('/home');
-  }
-  else {
-    // Otherwise, allow navigation
+    if (to.name !== 'Login') {
+      next({ name: 'Login' });
+    } else {
+      next();
+    }
+  } else if (to.name === 'Login' && isAuthenticated) {
+    next({ name: 'Home' });
+  } else {
     next();
   }
 });

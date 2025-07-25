@@ -11,6 +11,7 @@
             v-model="username"
             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             required
+            :disabled="isLoading"
           />
         </div>
         <div class="mb-6">
@@ -21,6 +22,7 @@
             v-model="password"
             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
             required
+            :disabled="isLoading"
           />
         </div>
         <div v-if="loginError" class="text-red-500 text-sm mb-4">{{ loginError }}</div>
@@ -28,8 +30,9 @@
           <button
             type="submit"
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+            :disabled="isLoading"
           >
-            Sign In
+            {{ isLoading ? 'Signing In...' : 'Sign In' }}
           </button>
         </div>
       </form>
@@ -45,21 +48,24 @@ const router = useRouter();
 const username = ref('');
 const password = ref('');
 const loginError = ref('');
+const isLoading = ref(false);
 
-const login = () => {
-  // --- Simple Mock Authentication ---
-  // In a real application, you would send these credentials to a backend API
-  // and receive a token or session ID upon successful authentication.
-  if (username.value === 'Admin' && password.value === 'password') {
-    localStorage.setItem('isAuthenticated', 'true'); // Set the auth flag
-    loginError.value = ''; // Clear any previous errors
-    router.push('/home'); // Redirect to the protected home page
-  } else {
-    loginError.value = 'Invalid username or password.';
+const login = async () => {
+  isLoading.value = true;
+  try {
+    if (username.value === 'Admin' && password.value === 'password') {
+      localStorage.setItem('isAuthenticated', 'true');
+      loginError.value = '';
+      await router.push({ name: 'Home' });
+    } else {
+      loginError.value = 'Invalid username or password.';
+    }
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>
 
 <style scoped>
-/* Add any specific styles for Login.vue here if needed */
+/* Specific styles for Login.vue if needed */
 </style>
