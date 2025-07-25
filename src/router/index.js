@@ -4,7 +4,7 @@ import Home from '../components/Home.vue';
 
 const routes = [
   {
-    path: '/',
+    path: '/login',
     name: 'Login',
     component: LoginForm
   },
@@ -27,7 +27,7 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.requiresAuth && !isAuthenticated) {
     // If the route requires auth and user is not authenticated, redirect to login
-    next('/');
+    next('/login');
   } else if (to.path === '/' && isAuthenticated) {
     // If user is authenticated and tries to go to '/', redirect to home
     next('/home');

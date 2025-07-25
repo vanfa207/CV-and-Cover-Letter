@@ -1,5 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-purple-100 to-blue-200 flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 font-inter">
+  <div class="min-h-screen bg-gradient-to-br from-purple-100 to-blue-200 flex flex-col items-center p-4 sm:p-6 lg:p-8 font-inter">
+
     <div class="mb-8 flex flex-col justify-center space-y-4 md:flex-row md:space-x-4 md:space-y-0 w-full max-w-4xl mx-auto">
       <button
         @click="currentPage = 'profile'"
@@ -22,24 +23,36 @@
       >
         Cover Letter Form
       </button>
+
+      <button
+        @click="logout"
+        class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+      >
+        Logout
+      </button>
     </div>
 
-    <ProfileCard v-if="currentPage === 'profile'" :profile="profile" @update-profile="updateProfile" />
-    <CVForm v-if="currentPage === 'cv'" @save-cv="saveCvData" />
-    <CoverLetterForm v-if="currentPage === 'coverLetter'" @save-letter="saveCoverLetterData" />
+    <div class="flex justify-center w-full max-w-4xl mx-auto">
+      <ProfileCard v-if="currentPage === 'profile'" :profile="profile" @update-profile="updateProfile" />
+      <CVForm v-if="currentPage === 'cv'" @save-cv="saveCvData" :profile-data="profile" /> <CoverLetterForm v-if="currentPage === 'coverLetter'" @save-letter="saveCoverLetterData" />
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue';
-// FIX IS HERE:
-import CVForm from './CVForm.vue'; // Changed from './components/CVForm.vue'
-import CoverLetterForm from './CoverLetterForm.vue'; // Changed from './components/CoverLetterForm.vue'
-import ProfileCard from './ProfileCard.vue'; // Changed from './components/ProfileCard.vue'
+import { useRouter } from 'vue-router';
 
-const currentPage = ref('profile'); // Reactive state for current page
+// Import your components. Ensure the paths are correct relative to Home.vue
+import CVForm from './CVForm.vue';
+import CoverLetterForm from './CoverLetterForm.vue';
+import ProfileCard from './ProfileCard.vue';
 
-// Reactive state for user profile data
+const router = useRouter(); // Initialize router for logout
+
+const currentPage = ref('profile'); // Reactive state for current page, starts on 'profile'
+
+// Reactive state for user profile data (This is the source of truth for profile data)
 const profile = reactive({
   name: 'Phit Sofa',
   title: 'Web developer',
@@ -55,7 +68,7 @@ const profile = reactive({
 const updateProfile = (newProfileData) => {
   Object.assign(profile, newProfileData);
   console.log('Profile updated:', newProfileData);
-  // In a real app, save to backend/local storage
+  // In a real app, you would save this to localStorage or send to a backend
 };
 
 const saveCvData = (data) => {
@@ -67,10 +80,17 @@ const saveCoverLetterData = (data) => {
   console.log('Cover Letter Data Saved:', data);
   // In a real app, save to backend/local storage
 };
+
+const logout = () => {
+  localStorage.removeItem('isAuthenticated'); // Clear the auth flag
+  router.push('/login'); // Redirect to the login page
+};
 </script>
 
-<style lang="scss" scoped>
-/* Global styles or specific App.vue styles */
-/* The 'body' style should ideally be in a global CSS file, not scoped here. */
-/* For example, in src/assets/main.css or src/style.css */
+<style scoped>
+/* Specific styles for Home.vue if needed */
+/* The gradient background is now applied here */
+.font-inter {
+  font-family: 'Inter', sans-serif; /* Ensure Inter font is loaded or available */
+}
 </style>
